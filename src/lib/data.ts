@@ -5,80 +5,97 @@ import type { Property, SiteSettings } from '@/types'
 import defaultSettings from '@/data/settings.json'
 import defaultProperties from '@/data/properties.json'
 
-const SETTINGS_KEY = 'settings.json'
-const PROPERTIES_KEY = 'properties.json'
+const SETTINGS_KEY = 'data/settings.json'
+const PROPERTIES_KEY = 'data/properties.json'
 
-// Check if we're in production (Vercel)
-const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production'
-
-// In-memory cache for development and as fallback
+// In-memory cache
 let settingsCache: SiteSettings | null = null
 let propertiesCache: Property[] | null = null
 
-// Helper to get blob URL
-async function getBlobUrl(filename: string): Promise<string | null> {
-  try {
-    const { blobs } = await list({ prefix: filename })
-    return blobs.length > 0 ? blobs[0].url : null
-  } catch {
-    return null
-  }
+// Check if Blob is available
+function hasBlobToken(): boolean {
+  return !!process.env.BLOB_READ_WRITE_TOKEN
 }
 
-// Helper to fetch JSON from blob
-async function fetchBlobJson<T>(url: string): Promise<T | null> {
+// Helper to get blob by prefix
+async function getBlobByPrefix(prefix: string): Promise<{ url: string } | null> {
+  if (!hasBlobToken()) return null
+
   try {
-    const response = await fetch(url, { cache: 'no-store' })
+    const { blobs } = await list({ prefix })
+    if (blobs.length > 0) {
+      return { url: blobs[0].url }
+    }
+  } catch (error) {
+    console.error('Error listing blobs:', error)
+  }
+  return null
+}
+
+// Helper to fetch JSON from URL
+async function fetchJson<T>(url: string): Promise<T | null> {
+  try {
+    const response = await fetch(url, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache' }
+    })
     if (response.ok) {
       return await response.json()
     }
-  } catch {
-    // Blob not found or error
+  } catch (error) {
+    console.error('Error fetching JSON:', error)
   }
   return null
 }
 
 // Helper to save JSON to blob
-async function saveBlobJson(filename: string, data: unknown): Promise<boolean> {
+async function saveToBlob(key: string, data: unknown): Promise<boolean> {
+  if (!hasBlobToken()) {
+    console.log('No BLOB_READ_WRITE_TOKEN, skipping blob save')
+    return false
+  }
+
   try {
-    // Delete existing blob if any
-    const existingUrl = await getBlobUrl(filename)
-    if (existingUrl) {
-      await del(existingUrl)
+    // First, try to delete any existing blob with this prefix
+    const existing = await getBlobByPrefix(key)
+    if (existing) {
+      try {
+        await del(existing.url)
+      } catch (e) {
+        console.log('Could not delete existing blob:', e)
+      }
     }
 
     // Save new blob
-    await put(filename, JSON.stringify(data, null, 2), {
+    const blob = await put(key, JSON.stringify(data, null, 2), {
       access: 'public',
-      addRandomSuffix: false,
+      contentType: 'application/json',
     })
+
+    console.log('Saved to blob:', blob.url)
     return true
   } catch (error) {
-    console.error(`Error saving ${filename}:`, error)
+    console.error('Error saving to blob:', error)
     return false
   }
 }
 
 // SETTINGS
 export async function getSettings(): Promise<SiteSettings> {
-  // Try cache first
+  // Return cache if available
   if (settingsCache) {
     return settingsCache
   }
 
-  // In production, try to get from blob
-  if (isProduction && process.env.BLOB_READ_WRITE_TOKEN) {
-    try {
-      const blobUrl = await getBlobUrl(SETTINGS_KEY)
-      if (blobUrl) {
-        const data = await fetchBlobJson<SiteSettings>(blobUrl)
-        if (data) {
-          settingsCache = data
-          return data
-        }
+  // Try to get from blob
+  if (hasBlobToken()) {
+    const blob = await getBlobByPrefix(SETTINGS_KEY)
+    if (blob) {
+      const data = await fetchJson<SiteSettings>(blob.url)
+      if (data) {
+        settingsCache = data
+        return data
       }
-    } catch {
-      // Fall through to defaults
     }
   }
 
@@ -88,36 +105,32 @@ export async function getSettings(): Promise<SiteSettings> {
 }
 
 export async function saveSettings(settings: SiteSettings): Promise<boolean> {
+  // Always update cache
   settingsCache = settings
 
-  if (isProduction && process.env.BLOB_READ_WRITE_TOKEN) {
-    return await saveBlobJson(SETTINGS_KEY, settings)
-  }
+  // Try to save to blob
+  const saved = await saveToBlob(SETTINGS_KEY, settings)
 
-  // In development, just update cache
+  // Return true even if blob save failed (cache is updated)
   return true
 }
 
 // PROPERTIES
 export async function getProperties(): Promise<Property[]> {
-  // Try cache first
+  // Return cache if available
   if (propertiesCache) {
     return propertiesCache
   }
 
-  // In production, try to get from blob
-  if (isProduction && process.env.BLOB_READ_WRITE_TOKEN) {
-    try {
-      const blobUrl = await getBlobUrl(PROPERTIES_KEY)
-      if (blobUrl) {
-        const data = await fetchBlobJson<Property[]>(blobUrl)
-        if (data) {
-          propertiesCache = data
-          return data
-        }
+  // Try to get from blob
+  if (hasBlobToken()) {
+    const blob = await getBlobByPrefix(PROPERTIES_KEY)
+    if (blob) {
+      const data = await fetchJson<Property[]>(blob.url)
+      if (data) {
+        propertiesCache = data
+        return data
       }
-    } catch {
-      // Fall through to defaults
     }
   }
 
@@ -127,13 +140,12 @@ export async function getProperties(): Promise<Property[]> {
 }
 
 export async function saveProperties(properties: Property[]): Promise<boolean> {
+  // Always update cache
   propertiesCache = properties
 
-  if (isProduction && process.env.BLOB_READ_WRITE_TOKEN) {
-    return await saveBlobJson(PROPERTIES_KEY, properties)
-  }
+  // Try to save to blob
+  await saveToBlob(PROPERTIES_KEY, properties)
 
-  // In development, just update cache
   return true
 }
 

@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 import { getProperties, saveProperties, createProperty } from '@/lib/data'
 import type { Property } from '@/types'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET() {
   try {
     const properties = await getProperties()

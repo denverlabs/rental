@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { getSettings, saveSettings } from '@/lib/data'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET() {
   try {
     const settings = await getSettings()
@@ -25,7 +29,11 @@ export async function PUT(request: Request) {
       adminPassword: body.adminPassword || currentSettings.adminPassword
     }
 
-    await saveSettings(updatedSettings)
+    const success = await saveSettings(updatedSettings)
+
+    if (!success) {
+      return NextResponse.json({ error: 'Error saving settings' }, { status: 500 })
+    }
 
     // Return without password
     const { adminPassword, ...publicSettings } = updatedSettings
