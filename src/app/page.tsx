@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, Phone, Mail, MapPin, Users, Bed, Bath, Star, ChevronRight, Home, Instagram, Facebook } from 'lucide-react'
+import { MessageCircle, Phone, Mail, MapPin, Users, Bed, Bath, Star, ChevronRight, Home, Instagram, Facebook, PlusCircle } from 'lucide-react'
 import type { Property, SiteSettings } from '@/types'
 
 export default function HomePage() {
@@ -41,6 +41,11 @@ export default function HomePage() {
 
   const getPropertyWhatsappLink = (property: Property) => {
     const message = `Hola! Me interesa la propiedad: ${property.title} - ${property.location}`
+    return `https://wa.me/${settings?.whatsappNumber}?text=${encodeURIComponent(message)}`
+  }
+
+  const getListPropertyWhatsappLink = () => {
+    const message = `Hola! Me gustaría publicar mi propiedad en Rond Point Rentals. ¿Pueden darme más información?`
     return `https://wa.me/${settings?.whatsappNumber}?text=${encodeURIComponent(message)}`
   }
 
@@ -373,18 +378,48 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* List Your Property CTA */}
+      <section className="py-16 bg-gradient-to-r from-[#25D366] to-[#128C7E]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            ¿Tienes una propiedad para alquilar?
+          </h2>
+          <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
+            Únete a nuestra red de propietarios y llega a miles de viajeros. Publicamos tu propiedad gratis.
+          </p>
+          <a
+            href={getListPropertyWhatsappLink()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 bg-white text-[#25D366] hover:bg-gray-100 font-bold text-lg px-8 py-4 rounded-full transition-all hover:scale-105 shadow-xl"
+          >
+            <PlusCircle className="w-6 h-6" />
+            Publicar mi Propiedad
+          </a>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
+          <div className="grid md:grid-cols-3 gap-8 items-center">
+            <div className="flex items-center gap-2 justify-center md:justify-start">
               <Home className="w-8 h-8 text-primary-400" />
               <span className="text-xl font-bold">{settings?.siteName}</span>
             </div>
-            <p className="text-gray-400 text-sm">{settings?.footerText}</p>
-            <a href="/admin" className="text-gray-500 hover:text-gray-300 text-sm transition-colors">
-              Admin
-            </a>
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">{settings?.footerText}</p>
+              {settings?.email && (
+                <a href={`mailto:${settings.email}`} className="text-gray-500 hover:text-primary-400 text-sm transition-colors">
+                  {settings.email}
+                </a>
+              )}
+            </div>
+            <div className="flex justify-center md:justify-end">
+              <a href="/admin" className="text-gray-600 hover:text-gray-400 text-xs transition-colors">
+                Admin
+              </a>
+            </div>
           </div>
         </div>
       </footer>
