@@ -1,0 +1,59 @@
+[
+  {
+    "id": "prop-1",
+    "title": "Villa Moderna con Piscina",
+    "description": "Hermosa villa moderna con piscina privada, perfecta para familias. Disfruta de amplios espacios, cocina equipada y vistas espectaculares.",
+    "location": "Punta Cana, República Dominicana",
+    "price": "$250",
+    "priceNote": "por noche",
+    "images": [
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80"
+    ],
+    "airbnbUrl": "https://www.airbnb.com",
+    "featured": true,
+    "amenities": ["Piscina", "WiFi", "Aire acondicionado", "Cocina", "Estacionamiento", "TV"],
+    "guests": 8,
+    "bedrooms": 4,
+    "bathrooms": 3
+  },
+  {
+    "id": "prop-2",
+    "title": "Apartamento Frente al Mar",
+    "description": "Acogedor apartamento con vista directa al océano. Ideal para parejas o pequeños grupos que buscan relajarse.",
+    "location": "Bávaro, República Dominicana",
+    "price": "$150",
+    "priceNote": "por noche",
+    "images": [
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80",
+      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
+      "https://images.unsplash.com/photo-1484154218962-a197022b25ba?w=800&q=80"
+    ],
+    "airbnbUrl": "https://www.airbnb.com",
+    "featured": false,
+    "amenities": ["Vista al mar", "WiFi", "Aire acondicionado", "Cocina", "Balcón"],
+    "guests": 4,
+    "bedrooms": 2,
+    "bathrooms": 1
+  },
+  {
+    "id": "prop-3",
+    "title": "Casa de Playa Tropical",
+    "description": "Encantadora casa de playa rodeada de naturaleza tropical. A pocos pasos de la arena blanca.",
+    "location": "Las Terrenas, República Dominicana",
+    "price": "$180",
+    "priceNote": "por noche",
+    "images": [
+      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=1200&q=80",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80",
+      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80"
+    ],
+    "airbnbUrl": "https://www.airbnb.com",
+    "featured": false,
+    "amenities": ["Playa cercana", "WiFi", "Jardín", "Terraza", "BBQ", "Hamacas"],
+    "guests": 6,
+    "bedrooms": 3,
+    "bathrooms": 2
+  }
+]
