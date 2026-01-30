@@ -208,7 +208,7 @@ export default function AdminPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
-              <p className="text-sm text-gray-500">Paradise Rentals</p>
+              <p className="text-sm text-gray-500">Rond Point Rentals</p>
             </div>
           </div>
 
@@ -236,10 +236,6 @@ export default function AdminPage() {
               Ingresar
             </button>
           </form>
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Contraseña por defecto: admin123
-          </p>
         </div>
       </div>
     )
@@ -266,7 +262,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <h2 className="font-bold">Admin</h2>
-                  <p className="text-xs text-gray-400">Paradise Rentals</p>
+                  <p className="text-xs text-gray-400">Rond Point Rentals</p>
                 </div>
               </>
             )}
