@@ -8,10 +8,6 @@ import defaultProperties from '@/data/properties.json'
 const SETTINGS_KEY = 'data/settings.json'
 const PROPERTIES_KEY = 'data/properties.json'
 
-// In-memory cache
-let settingsCache: SiteSettings | null = null
-let propertiesCache: Property[] | null = null
-
 // Check if Blob is available
 function hasBlobToken(): boolean {
   return !!process.env.BLOB_READ_WRITE_TOKEN
@@ -24,7 +20,11 @@ async function getBlobByPrefix(prefix: string): Promise<{ url: string } | null> 
   try {
     const { blobs } = await list({ prefix })
     if (blobs.length > 0) {
-      return { url: blobs[0].url }
+      // Get the most recent blob
+      const sorted = blobs.sort((a, b) =>
+        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+      )
+      return { url: sorted[0].url }
     }
   } catch (error) {
     console.error('Error listing blobs:', error)
@@ -32,12 +32,17 @@ async function getBlobByPrefix(prefix: string): Promise<{ url: string } | null> 
   return null
 }
 
-// Helper to fetch JSON from URL
+// Helper to fetch JSON from URL with cache busting
 async function fetchJson<T>(url: string): Promise<T | null> {
   try {
-    const response = await fetch(url, {
+    // Add cache busting parameter
+    const cacheBustUrl = `${url}?t=${Date.now()}`
+    const response = await fetch(cacheBustUrl, {
       cache: 'no-store',
-      headers: { 'Cache-Control': 'no-cache' }
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      }
     })
     if (response.ok) {
       return await response.json()
@@ -56,11 +61,12 @@ async function saveToBlob(key: string, data: unknown): Promise<boolean> {
   }
 
   try {
-    // First, try to delete any existing blob with this prefix
-    const existing = await getBlobByPrefix(key)
-    if (existing) {
+    // First, delete ALL existing blobs with this prefix
+    const { blobs } = await list({ prefix: key })
+    for (const blob of blobs) {
       try {
-        await del(existing.url)
+        await del(blob.url)
+        console.log('Deleted old blob:', blob.url)
       } catch (e) {
         console.log('Could not delete existing blob:', e)
       }
@@ -70,6 +76,7 @@ async function saveToBlob(key: string, data: unknown): Promise<boolean> {
     const blob = await put(key, JSON.stringify(data, null, 2), {
       access: 'public',
       contentType: 'application/json',
+      addRandomSuffix: false, // Keep consistent filename
     })
 
     console.log('Saved to blob:', blob.url)
@@ -80,71 +87,64 @@ async function saveToBlob(key: string, data: unknown): Promise<boolean> {
   }
 }
 
-// SETTINGS
+// SETTINGS - Always fetch fresh from Blob
 export async function getSettings(): Promise<SiteSettings> {
-  // Return cache if available
-  if (settingsCache) {
-    return settingsCache
-  }
-
   // Try to get from blob
   if (hasBlobToken()) {
     const blob = await getBlobByPrefix(SETTINGS_KEY)
     if (blob) {
       const data = await fetchJson<SiteSettings>(blob.url)
       if (data) {
-        settingsCache = data
+        console.log('Loaded settings from blob')
         return data
       }
     }
   }
 
-  // Return defaults
-  settingsCache = defaultSettings as SiteSettings
-  return settingsCache
+  // Return defaults if no blob data
+  console.log('Using default settings')
+  return defaultSettings as SiteSettings
 }
 
 export async function saveSettings(settings: SiteSettings): Promise<boolean> {
-  // Always update cache
-  settingsCache = settings
-
-  // Try to save to blob
+  // Save to blob
   const saved = await saveToBlob(SETTINGS_KEY, settings)
 
-  // Return true even if blob save failed (cache is updated)
+  if (!saved) {
+    console.error('Failed to save settings to blob')
+    return false
+  }
+
   return true
 }
 
-// PROPERTIES
+// PROPERTIES - Always fetch fresh from Blob
 export async function getProperties(): Promise<Property[]> {
-  // Return cache if available
-  if (propertiesCache) {
-    return propertiesCache
-  }
-
   // Try to get from blob
   if (hasBlobToken()) {
     const blob = await getBlobByPrefix(PROPERTIES_KEY)
     if (blob) {
       const data = await fetchJson<Property[]>(blob.url)
       if (data) {
-        propertiesCache = data
+        console.log('Loaded properties from blob')
         return data
       }
     }
   }
 
-  // Return defaults
-  propertiesCache = defaultProperties as Property[]
-  return propertiesCache
+  // Return defaults if no blob data
+  console.log('Using default properties')
+  return defaultProperties as Property[]
 }
 
 export async function saveProperties(properties: Property[]): Promise<boolean> {
-  // Always update cache
-  propertiesCache = properties
+  // Save to blob
+  const saved = await saveToBlob(PROPERTIES_KEY, properties)
 
-  // Try to save to blob
-  await saveToBlob(PROPERTIES_KEY, properties)
+  if (!saved) {
+    console.error('Failed to save properties to blob')
+    return false
+  }
 
   return true
 }
@@ -182,10 +182,4 @@ export async function deleteProperty(id: string): Promise<boolean> {
 
   await saveProperties(filtered)
   return true
-}
-
-// Clear cache (useful for forcing refresh)
-export function clearCache() {
-  settingsCache = null
-  propertiesCache = null
 }

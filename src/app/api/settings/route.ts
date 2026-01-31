@@ -10,7 +10,13 @@ export async function GET() {
     const settings = await getSettings()
     // Don't expose admin password in API response
     const { adminPassword, ...publicSettings } = settings
-    return NextResponse.json(publicSettings)
+    return NextResponse.json(publicSettings, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    })
   } catch (error) {
     console.error('Error fetching settings:', error)
     return NextResponse.json({ error: 'Error fetching settings' }, { status: 500 })

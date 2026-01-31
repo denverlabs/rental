@@ -9,7 +9,13 @@ export const revalidate = 0
 export async function GET() {
   try {
     const properties = await getProperties()
-    return NextResponse.json(properties)
+    return NextResponse.json(properties, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    })
   } catch (error) {
     console.error('Error fetching properties:', error)
     return NextResponse.json({ error: 'Error fetching properties' }, { status: 500 })

@@ -53,7 +53,9 @@ export default function AdminPage() {
       if (res.ok) {
         setIsAuthenticated(true)
         setAuthError('')
-        sessionStorage.setItem('admin_auth', 'true')
+        // Set cookie with 7 day expiry
+        const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString()
+        document.cookie = `admin_auth=true; expires=${expires}; path=/`
       } else {
         setAuthError('Contraseña incorrecta')
       }
@@ -64,13 +66,16 @@ export default function AdminPage() {
 
   const handleLogout = () => {
     setIsAuthenticated(false)
-    sessionStorage.removeItem('admin_auth')
+    // Delete cookie by setting expired date
+    document.cookie = 'admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/'
   }
 
-  // Check session on mount
+  // Check session on mount (use cookies for persistence)
   useEffect(() => {
-    const auth = sessionStorage.getItem('admin_auth')
-    if (auth === 'true') {
+    // Check cookie for auth
+    const cookies = document.cookie.split(';')
+    const authCookie = cookies.find(c => c.trim().startsWith('admin_auth='))
+    if (authCookie && authCookie.split('=')[1] === 'true') {
       setIsAuthenticated(true)
     }
   }, [])
@@ -81,9 +86,11 @@ export default function AdminPage() {
 
     const fetchData = async () => {
       try {
+        // Add cache-busting timestamp to prevent stale data
+        const timestamp = Date.now()
         const [propsRes, settingsRes] = await Promise.all([
-          fetch('/api/properties'),
-          fetch('/api/settings')
+          fetch(`/api/properties?t=${timestamp}`, { cache: 'no-store' }),
+          fetch(`/api/settings?t=${timestamp}`, { cache: 'no-store' })
         ])
         setProperties(await propsRes.json())
         setSettings(await settingsRes.json())

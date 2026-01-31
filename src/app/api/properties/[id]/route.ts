@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { getProperty, updateProperty, deleteProperty } from '@/lib/data'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
