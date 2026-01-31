@@ -8,6 +8,7 @@ export interface Property {
   images: string[];
   airbnbUrl: string;
   featured: boolean;
+  active: boolean;
   amenities: string[];
   guests: number;
   bedrooms: number;
@@ -23,6 +24,7 @@ export interface SiteSettings {
   email: string;
   instagram?: string;
   facebook?: string;
+  tiktok?: string;
   footerText: string;
   adminPassword: string;
 }

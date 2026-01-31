@@ -1,8 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MessageCircle, Phone, Mail, MapPin, Users, Bed, Bath, Star, ChevronRight, Home, Instagram, Facebook, PlusCircle } from 'lucide-react'
+import { MessageCircle, MapPin, Users, Bed, Bath, Star, Home, Instagram, Facebook, PlusCircle } from 'lucide-react'
 import type { Property, SiteSettings } from '@/types'
+
+// TikTok icon component
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+  </svg>
+)
 
 export default function HomePage() {
   const [properties, setProperties] = useState<Property[]>([])
@@ -20,11 +27,14 @@ export default function HomePage() {
         ])
         const propsData = await propsRes.json()
         const settingsData = await settingsRes.json()
-        setProperties(propsData)
+
+        // Filter only active properties
+        const activeProperties = propsData.filter((p: Property) => p.active !== false)
+        setProperties(activeProperties)
         setSettings(settingsData)
 
         // Set featured property as selected
-        const featured = propsData.find((p: Property) => p.featured) || propsData[0]
+        const featured = activeProperties.find((p: Property) => p.featured) || activeProperties[0]
         setSelectedProperty(featured)
       } catch (error) {
         console.error('Error fetching data:', error)
@@ -45,7 +55,7 @@ export default function HomePage() {
   }
 
   const getListPropertyWhatsappLink = () => {
-    const message = `Hola! Me gustaría publicar mi propiedad en Rond Point Rentals. ¿Pueden darme más información?`
+    const message = `Hola! Me gustaría publicar mi propiedad en Rond Point Rentals.`
     return `https://wa.me/${settings?.whatsappNumber}?text=${encodeURIComponent(message)}`
   }
 
@@ -314,14 +324,14 @@ export default function HomePage() {
       </section>
 
       {/* Contact Section */}
-      <section id="contacto" className="py-16 lg:py-24 bg-white">
+      <section id="contacto" className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               ¿Tienes Preguntas?
             </h2>
             <p className="text-gray-600 text-lg mb-8">
-              Estamos aquí para ayudarte. Contáctanos directamente y te responderemos lo antes posible.
+              Estamos aquí para ayudarte. Contáctanos directamente.
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4 mb-8">
@@ -339,87 +349,75 @@ export default function HomePage() {
               </a>
 
               <a
-                href={`mailto:${settings?.email}`}
+                href={getListPropertyWhatsappLink()}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center justify-center gap-3 bg-primary-500 hover:bg-primary-600 text-white p-6 rounded-2xl transition-all hover:scale-105"
               >
-                <Mail className="w-8 h-8" />
+                <PlusCircle className="w-8 h-8" />
                 <div className="text-left">
-                  <div className="font-bold text-lg">Email</div>
-                  <div className="text-white/80 text-sm">{settings?.email}</div>
+                  <div className="font-bold text-lg">Publicar Propiedad</div>
+                  <div className="text-white/80 text-sm">Únete a nuestra red</div>
                 </div>
               </a>
             </div>
 
-            {(settings?.instagram || settings?.facebook) && (
-              <div className="flex items-center justify-center gap-4">
-                {settings?.instagram && (
-                  <a
-                    href={`https://instagram.com/${settings.instagram}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform"
-                  >
-                    <Instagram className="w-6 h-6" />
-                  </a>
-                )}
-                {settings?.facebook && (
-                  <a
-                    href={`https://facebook.com/${settings.facebook}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-12 h-12 bg-[#1877F2] rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform"
-                  >
-                    <Facebook className="w-6 h-6" />
-                  </a>
-                )}
-              </div>
-            )}
+            {/* Social Media */}
+            <div className="flex items-center justify-center gap-4">
+              {settings?.instagram && (
+                <a
+                  href={`https://instagram.com/${settings.instagram}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform"
+                >
+                  <Instagram className="w-6 h-6" />
+                </a>
+              )}
+              {settings?.facebook && (
+                <a
+                  href={`https://facebook.com/${settings.facebook}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-[#1877F2] rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform"
+                >
+                  <Facebook className="w-6 h-6" />
+                </a>
+              )}
+              {settings?.tiktok && (
+                <a
+                  href={`https://tiktok.com/@${settings.tiktok}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform"
+                >
+                  <TikTokIcon className="w-6 h-6" />
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* List Your Property CTA */}
-      <section className="py-16 bg-gradient-to-r from-[#25D366] to-[#128C7E]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            ¿Tienes una propiedad para alquilar?
-          </h2>
-          <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-            Únete a nuestra red de propietarios y llega a miles de viajeros. Publicamos tu propiedad gratis.
-          </p>
-          <a
-            href={getListPropertyWhatsappLink()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-white text-[#25D366] hover:bg-gray-100 font-bold text-lg px-8 py-4 rounded-full transition-all hover:scale-105 shadow-xl"
-          >
-            <PlusCircle className="w-6 h-6" />
-            Publicar mi Propiedad
-          </a>
-        </div>
-      </section>
-
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8 items-center">
-            <div className="flex items-center gap-2 justify-center md:justify-start">
-              <Home className="w-8 h-8 text-primary-400" />
-              <span className="text-xl font-bold">{settings?.siteName}</span>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Home className="w-6 h-6 text-primary-400" />
+              <span className="font-bold">{settings?.siteName}</span>
             </div>
-            <div className="text-center">
-              <p className="text-gray-400 text-sm">{settings?.footerText}</p>
+            <div className="text-center text-gray-400 text-sm">
+              {settings?.footerText}
               {settings?.email && (
-                <a href={`mailto:${settings.email}`} className="text-gray-500 hover:text-primary-400 text-sm transition-colors">
-                  {settings.email}
-                </a>
+                <span className="ml-2">
+                  | <a href={`mailto:${settings.email}`} className="hover:text-primary-400 transition-colors">{settings.email}</a>
+                </span>
               )}
             </div>
-            <div className="flex justify-center md:justify-end">
-              <a href="/admin" className="text-gray-600 hover:text-gray-400 text-xs transition-colors">
-                Admin
-              </a>
-            </div>
+            <a href="/admin" className="text-gray-600 hover:text-gray-400 text-xs transition-colors">
+              Admin
+            </a>
           </div>
         </div>
       </footer>

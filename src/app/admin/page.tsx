@@ -10,13 +10,16 @@ import {
   Save,
   LogOut,
   Eye,
+  EyeOff,
   Edit3,
   X,
   Star,
   StarOff,
   ExternalLink,
   Menu,
-  ChevronLeft
+  ChevronLeft,
+  ToggleLeft,
+  ToggleRight
 } from 'lucide-react'
 import type { Property, SiteSettings } from '@/types'
 
@@ -180,6 +183,12 @@ export default function AdminPage() {
     await saveProperty(updated)
   }
 
+  // Toggle active
+  const toggleActive = async (property: Property) => {
+    const updated = { ...property, active: !property.active }
+    await saveProperty(updated)
+  }
+
   // New property
   const newProperty = (): Property => ({
     id: `new-${Date.now()}`,
@@ -191,6 +200,7 @@ export default function AdminPage() {
     images: ['', '', ''],
     airbnbUrl: '',
     featured: false,
+    active: true,
     amenities: [],
     guests: 2,
     bedrooms: 1,
@@ -358,24 +368,34 @@ export default function AdminPage() {
           {activeTab === 'properties' && (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {properties.map((property) => (
-                <div key={property.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div
+                  key={property.id}
+                  className={`bg-white rounded-xl shadow-sm overflow-hidden ${!property.active ? 'opacity-60' : ''}`}
+                >
                   <div className="relative aspect-[4/3]">
                     {property.images[0] ? (
                       <img
                         src={property.images[0]}
                         alt={property.title}
-                        className="w-full h-full object-cover"
+                        className={`w-full h-full object-cover ${!property.active ? 'grayscale' : ''}`}
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                         <Image className="w-12 h-12 text-gray-400" />
                       </div>
                     )}
-                    {property.featured && (
-                      <div className="absolute top-3 left-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                        <Star className="w-3 h-3" /> Destacada
-                      </div>
-                    )}
+                    <div className="absolute top-3 left-3 flex gap-2">
+                      {property.featured && (
+                        <div className="bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                          <Star className="w-3 h-3" /> Destacada
+                        </div>
+                      )}
+                      {!property.active && (
+                        <div className="bg-gray-600 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                          <EyeOff className="w-3 h-3" /> Inactiva
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="p-4">
@@ -394,6 +414,17 @@ export default function AdminPage() {
                         className="flex-1 flex items-center justify-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg text-sm transition-colors"
                       >
                         <Edit3 className="w-4 h-4" /> Editar
+                      </button>
+                      <button
+                        onClick={() => toggleActive(property)}
+                        className={`p-2 rounded-lg transition-colors ${
+                          property.active
+                            ? 'bg-green-100 text-green-600 hover:bg-green-200'
+                            : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                        }`}
+                        title={property.active ? 'Desactivar' : 'Activar'}
+                      >
+                        {property.active ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
                       </button>
                       <button
                         onClick={() => toggleFeatured(property)}
@@ -467,7 +498,7 @@ export default function AdminPage() {
                         value={settings.whatsappNumber}
                         onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
                         className="admin-input"
-                        placeholder="18091234567"
+                        placeholder="5491126569371"
                       />
                     </div>
                     <div>
@@ -493,25 +524,35 @@ export default function AdminPage() {
 
                 <div className="border-t pt-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Redes Sociales</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label className="admin-label">Instagram (usuario)</label>
+                      <label className="admin-label">Instagram</label>
                       <input
                         type="text"
                         value={settings.instagram || ''}
                         onChange={(e) => setSettings({ ...settings, instagram: e.target.value })}
                         className="admin-input"
-                        placeholder="paradiserentals"
+                        placeholder="usuario"
                       />
                     </div>
                     <div>
-                      <label className="admin-label">Facebook (usuario)</label>
+                      <label className="admin-label">Facebook</label>
                       <input
                         type="text"
                         value={settings.facebook || ''}
                         onChange={(e) => setSettings({ ...settings, facebook: e.target.value })}
                         className="admin-input"
-                        placeholder="paradiserentals"
+                        placeholder="usuario"
+                      />
+                    </div>
+                    <div>
+                      <label className="admin-label">TikTok</label>
+                      <input
+                        type="text"
+                        value={settings.tiktok || ''}
+                        onChange={(e) => setSettings({ ...settings, tiktok: e.target.value })}
+                        className="admin-input"
+                        placeholder="usuario"
                       />
                     </div>
                   </div>
@@ -574,7 +615,10 @@ function PropertyModal({
   onClose: () => void
   saving: boolean
 }) {
-  const [form, setForm] = useState<Property>(property)
+  const [form, setForm] = useState<Property>({
+    ...property,
+    active: property.active !== false
+  })
   const [amenityInput, setAmenityInput] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -615,6 +659,33 @@ function PropertyModal({
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Active Toggle */}
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div>
+              <label className="font-semibold text-gray-900">Estado de la propiedad</label>
+              <p className="text-sm text-gray-500">Las propiedades inactivas no se muestran en el sitio</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, active: !form.active })}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                form.active
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-gray-200 text-gray-600'
+              }`}
+            >
+              {form.active ? (
+                <>
+                  <ToggleRight className="w-5 h-5" /> Activa
+                </>
+              ) : (
+                <>
+                  <ToggleLeft className="w-5 h-5" /> Inactiva
+                </>
+              )}
+            </button>
+          </div>
+
           {/* Basic Info */}
           <div className="grid md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
@@ -713,7 +784,7 @@ function PropertyModal({
           <div>
             <label className="admin-label">Imágenes (URLs)</label>
             <p className="text-sm text-gray-500 mb-3">
-              La primera imagen será la principal. Puedes usar URLs de Unsplash, Airbnb, o cualquier imagen web.
+              Pega URLs de imágenes. La primera será la principal.
             </p>
             <div className="space-y-3">
               {[0, 1, 2].map((index) => (
