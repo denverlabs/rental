@@ -199,6 +199,7 @@ export default function AdminPage() {
   // New property
   const newProperty = (): Property => ({
     id: `new-${Date.now()}`,
+    referenceCode: '',
     title: '',
     description: '',
     location: '',
@@ -406,7 +407,14 @@ export default function AdminPage() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="font-bold text-gray-900 mb-1">{property.title || 'Sin título'}</h3>
+                    <div className="flex items-start justify-between mb-1">
+                      <h3 className="font-bold text-gray-900">{property.title || 'Sin título'}</h3>
+                      {property.referenceCode && (
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-mono">
+                          {property.referenceCode}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-500 mb-3">{property.location || 'Sin ubicación'}</p>
                     <p className="text-lg font-bold text-primary-500 mb-4">
                       {property.price} <span className="text-sm font-normal text-gray-500">{property.priceNote}</span>
@@ -579,6 +587,60 @@ export default function AdminPage() {
                 </div>
 
                 <div className="border-t pt-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Analytics y Tracking</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="admin-label">Google Analytics 4 (ID)</label>
+                      <input
+                        type="text"
+                        value={settings.googleAnalyticsId || ''}
+                        onChange={(e) => setSettings({ ...settings, googleAnalyticsId: e.target.value })}
+                        className="admin-input"
+                        placeholder="G-XXXXXXXXXX"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">ID de medición de GA4 (empieza con G-)</p>
+                    </div>
+                    <div>
+                      <label className="admin-label">Meta Pixel (Facebook)</label>
+                      <input
+                        type="text"
+                        value={settings.metaPixelId || ''}
+                        onChange={(e) => setSettings({ ...settings, metaPixelId: e.target.value })}
+                        className="admin-input"
+                        placeholder="123456789012345"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">ID del Pixel de Meta/Facebook (solo números)</p>
+                    </div>
+                    <div>
+                      <label className="admin-label">Google Tag Manager (ID)</label>
+                      <input
+                        type="text"
+                        value={settings.googleTagManagerId || ''}
+                        onChange={(e) => setSettings({ ...settings, googleTagManagerId: e.target.value })}
+                        className="admin-input"
+                        placeholder="GTM-XXXXXXX"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">ID del contenedor GTM (empieza con GTM-)</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Código Personalizado</h3>
+                  <div>
+                    <label className="admin-label">Código para {'<head>'}</label>
+                    <textarea
+                      value={settings.customHeadCode || ''}
+                      onChange={(e) => setSettings({ ...settings, customHeadCode: e.target.value })}
+                      className="admin-input font-mono text-sm"
+                      rows={5}
+                      placeholder="<!-- Pega aquí código adicional para el <head> -->"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Scripts, meta tags u otro código HTML para el {'<head>'}</p>
+                  </div>
+                </div>
+
+                <div className="border-t pt-6">
                   <button
                     onClick={saveSettings}
                     disabled={saving}
@@ -691,6 +753,19 @@ function PropertyModal({
                 </>
               )}
             </button>
+          </div>
+
+          {/* Reference Code */}
+          <div>
+            <label className="admin-label">Código de Ficha</label>
+            <input
+              type="text"
+              value={form.referenceCode || ''}
+              onChange={(e) => setForm({ ...form, referenceCode: e.target.value })}
+              className="admin-input"
+              placeholder="PDE-001"
+            />
+            <p className="text-xs text-gray-500 mt-1">Código interno para identificar la propiedad (ej: PDE-001)</p>
           </div>
 
           {/* Basic Info */}

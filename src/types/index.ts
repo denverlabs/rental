@@ -1,5 +1,6 @@
 export interface Property {
   id: string;
+  referenceCode?: string; // Número de ficha manual (ej: "PDE-001")
   title: string;
   description: string;
   location: string;
@@ -27,4 +28,9 @@ export interface SiteSettings {
   tiktok?: string;
   footerText: string;
   adminPassword: string;
+  // Analytics & Tracking
+  googleAnalyticsId?: string;    // GA4: G-XXXXXXXXXX
+  metaPixelId?: string;          // Facebook Pixel: 123456789
+  googleTagManagerId?: string;   // GTM: GTM-XXXXXXX
+  customHeadCode?: string;       // Código personalizado para <head>
 }

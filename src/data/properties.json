@@ -1,6 +1,7 @@
 [
   {
     "id": "prop-1",
+    "referenceCode": "PDE-001",
     "title": "Casa en La Barra con Piscina",
     "description": "Moderna casa a 3 cuadras del mar en La Barra. Piscina climatizada, parrillero y deck privado. Ideal para familias que buscan tranquilidad cerca de todo.",
     "location": "La Barra, Punta del Este",
@@ -21,6 +22,7 @@
   },
   {
     "id": "prop-2",
+    "referenceCode": "PDE-002",
     "title": "Depto Frente al Mar en Playa Brava",
     "description": "Apartamento premium con vista panorámica al océano. Ubicación inmejorable en Playa Brava. Amenities del edificio incluidos.",
     "location": "Playa Brava, Punta del Este",
@@ -41,6 +43,7 @@
   },
   {
     "id": "prop-3",
+    "referenceCode": "PDE-003",
     "title": "Chalet en Manantiales",
     "description": "Chalet con estilo rústico-moderno en el corazón de Manantiales. A pasos de los mejores restaurantes y la playa.",
     "location": "Manantiales, Punta del Este",
@@ -61,6 +64,7 @@
   },
   {
     "id": "prop-4",
+    "referenceCode": "PDE-004",
     "title": "Penthouse en Península",
     "description": "Penthouse de lujo con terraza panorámica en plena Península. Vista al puerto y a minutos del centro gastronómico.",
     "location": "Península, Punta del Este",
