@@ -34,3 +34,42 @@ export interface SiteSettings {
   googleTagManagerId?: string;   // GTM: GTM-XXXXXXX
   customHeadCode?: string;       // Código personalizado para <head>
 }
+
+// CRM Types
+export type ReservationStatus = 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled';
+export type ReservationSource = 'whatsapp' | 'airbnb' | 'direct' | 'other';
+
+export interface Guest {
+  id: string;
+  name: string;
+  email?: string;
+  phone: string;           // WhatsApp number
+  country?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface Reservation {
+  id: string;
+  propertyId: string;      // Links to Property.id
+  propertyCode: string;    // Links to Property.referenceCode (ej: "PDE-001")
+  guestId: string;         // Links to Guest.id
+
+  // Dates
+  checkIn: string;         // ISO date: "2026-01-15"
+  checkOut: string;        // ISO date: "2026-01-20"
+
+  // Status
+  status: ReservationStatus;
+  source: ReservationSource;
+
+  // Pricing
+  totalAmount: number;
+  currency: string;        // "USD" | "UYU"
+  paidAmount: number;
+
+  // Metadata
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
