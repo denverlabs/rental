@@ -1,10 +1,10 @@
 [
   {
     "id": "prop-1",
-    "title": "Villa Moderna con Piscina",
-    "description": "Hermosa villa moderna con piscina privada, perfecta para familias. Disfruta de amplios espacios, cocina equipada y vistas espectaculares.",
-    "location": "Punta Cana, República Dominicana",
-    "price": "$250",
+    "title": "Casa en La Barra con Piscina",
+    "description": "Moderna casa a 3 cuadras del mar en La Barra. Piscina climatizada, parrillero y deck privado. Ideal para familias que buscan tranquilidad cerca de todo.",
+    "location": "La Barra, Punta del Este",
+    "price": "USD 350",
     "priceNote": "por noche",
     "images": [
       "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80",
@@ -14,17 +14,17 @@
     "airbnbUrl": "https://www.airbnb.com",
     "featured": true,
     "active": true,
-    "amenities": ["Piscina", "WiFi", "Aire acondicionado", "Cocina", "Estacionamiento", "TV"],
+    "amenities": ["Piscina climatizada", "WiFi", "Aire acondicionado", "Parrillero", "Estacionamiento", "Smart TV"],
     "guests": 8,
     "bedrooms": 4,
     "bathrooms": 3
   },
   {
     "id": "prop-2",
-    "title": "Apartamento Frente al Mar",
-    "description": "Acogedor apartamento con vista directa al océano. Ideal para parejas o pequeños grupos que buscan relajarse.",
-    "location": "Bávaro, República Dominicana",
-    "price": "$150",
+    "title": "Depto Frente al Mar en Playa Brava",
+    "description": "Apartamento premium con vista panorámica al océano. Ubicación inmejorable en Playa Brava. Amenities del edificio incluidos.",
+    "location": "Playa Brava, Punta del Este",
+    "price": "USD 200",
     "priceNote": "por noche",
     "images": [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80",
@@ -34,17 +34,17 @@
     "airbnbUrl": "https://www.airbnb.com",
     "featured": false,
     "active": true,
-    "amenities": ["Vista al mar", "WiFi", "Aire acondicionado", "Cocina", "Balcón"],
+    "amenities": ["Vista al mar", "WiFi", "Aire acondicionado", "Gimnasio", "Balcón", "Seguridad 24hs"],
     "guests": 4,
     "bedrooms": 2,
-    "bathrooms": 1
+    "bathrooms": 2
   },
   {
     "id": "prop-3",
-    "title": "Casa de Playa Tropical",
-    "description": "Encantadora casa de playa rodeada de naturaleza tropical. A pocos pasos de la arena blanca.",
-    "location": "Las Terrenas, República Dominicana",
-    "price": "$180",
+    "title": "Chalet en Manantiales",
+    "description": "Chalet con estilo rústico-moderno en el corazón de Manantiales. A pasos de los mejores restaurantes y la playa.",
+    "location": "Manantiales, Punta del Este",
+    "price": "USD 280",
     "priceNote": "por noche",
     "images": [
       "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=1200&q=80",
@@ -54,9 +54,29 @@
     "airbnbUrl": "https://www.airbnb.com",
     "featured": false,
     "active": true,
-    "amenities": ["Playa cercana", "WiFi", "Jardín", "Terraza", "BBQ", "Hamacas"],
+    "amenities": ["Jardín privado", "WiFi", "Parrillero", "Terraza", "Bicicletas", "Pet friendly"],
     "guests": 6,
     "bedrooms": 3,
+    "bathrooms": 2
+  },
+  {
+    "id": "prop-4",
+    "title": "Penthouse en Península",
+    "description": "Penthouse de lujo con terraza panorámica en plena Península. Vista al puerto y a minutos del centro gastronómico.",
+    "location": "Península, Punta del Este",
+    "price": "USD 450",
+    "priceNote": "por noche",
+    "images": [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80"
+    ],
+    "airbnbUrl": "https://www.airbnb.com",
+    "featured": false,
+    "active": true,
+    "amenities": ["Terraza", "WiFi", "Aire acondicionado", "Vista al puerto", "Cochera", "Piscina edificio"],
+    "guests": 5,
+    "bedrooms": 2,
     "bathrooms": 2
   }
 ]
