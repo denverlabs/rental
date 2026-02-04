@@ -50,12 +50,12 @@ export default function HomePage() {
     : '#'
 
   const getPropertyWhatsappLink = (property: Property) => {
-    const message = `Hola! Me interesa la propiedad: ${property.title} - ${property.location}`
+    const message = `Hola! Me interesa: ${property.title} en ${property.location}. Quiero más info y disponibilidad.`
     return `https://wa.me/${settings?.whatsappNumber}?text=${encodeURIComponent(message)}`
   }
 
   const getListPropertyWhatsappLink = () => {
-    const message = `Hola! Me gustaría publicar mi propiedad en Rond Point Rentals.`
+    const message = `Hola! Tengo una propiedad en Punta del Este y me gustaría publicarla.`
     return `https://wa.me/${settings?.whatsappNumber}?text=${encodeURIComponent(message)}`
   }
 
@@ -212,7 +212,7 @@ export default function HomePage() {
                       className="btn-whatsapp w-full flex items-center justify-center gap-2"
                     >
                       <MessageCircle className="w-5 h-5" />
-                      Contactar por WhatsApp
+                      Consultar disponibilidad
                     </a>
                     <a
                       href={selectedProperty.airbnbUrl}
@@ -223,7 +223,7 @@ export default function HomePage() {
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 14.957c-.09.246-.195.479-.312.698-.366.681-.845 1.203-1.418 1.552-.573.349-1.222.523-1.936.523-.494 0-.95-.087-1.36-.262-.41-.174-.77-.419-1.07-.732-.18-.188-.34-.39-.48-.605-.14.215-.3.417-.48.605-.3.313-.66.558-1.07.732-.41.175-.866.262-1.36.262-.714 0-1.363-.174-1.936-.523-.573-.349-1.052-.871-1.418-1.552-.117-.219-.222-.452-.312-.698-.3-.82-.45-1.74-.45-2.757 0-.888.112-1.695.336-2.421.224-.726.544-1.36.96-1.9.416-.54.916-.96 1.5-1.26.584-.3 1.232-.45 1.944-.45.856 0 1.584.234 2.184.702.6.468 1.02 1.134 1.26 1.998h.048c.24-.864.66-1.53 1.26-1.998.6-.468 1.328-.702 2.184-.702.712 0 1.36.15 1.944.45.584.3 1.084.72 1.5 1.26.416.54.736 1.174.96 1.9.224.726.336 1.533.336 2.421 0 1.017-.15 1.937-.45 2.757z"/>
                       </svg>
-                      Reservar en Airbnb
+                      Ver en Airbnb
                     </a>
                   </div>
                 </div>
@@ -238,10 +238,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Todas Nuestras Propiedades
+              Propiedades en Punta del Este
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Explora nuestra colección completa de propiedades de alquiler vacacional
+              La Barra, Manantiales, José Ignacio, Playa Brava y más. Escribinos por WhatsApp y te armamos un presupuesto.
             </p>
           </div>
 
@@ -302,18 +302,18 @@ export default function HomePage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="flex-1 bg-[#25D366] hover:bg-[#20bd5a] text-white text-center py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                      className="flex-1 bg-[#25D366] hover:bg-[#20bd5a] text-white text-center py-2.5 px-3 rounded-lg text-sm font-medium transition-colors"
                     >
-                      WhatsApp
+                      Consultar
                     </a>
                     <a
                       href={property.airbnbUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="flex-1 bg-[#FF5A5F] hover:bg-[#e04e52] text-white text-center py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+                      className="flex-1 bg-[#FF5A5F] hover:bg-[#e04e52] text-white text-center py-2.5 px-3 rounded-lg text-sm font-medium transition-colors"
                     >
-                      Airbnb
+                      Ver en Airbnb
                     </a>
                   </div>
                 </div>
@@ -328,10 +328,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              ¿Tienes Preguntas?
+              ¿Tenés dudas? Escribinos
             </h2>
             <p className="text-gray-600 text-lg mb-8">
-              Estamos aquí para ayudarte. Contáctanos directamente.
+              Te respondemos al instante por WhatsApp. Consultá disponibilidad, precios y armamos tu presupuesto.
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4 mb-8">
@@ -343,8 +343,8 @@ export default function HomePage() {
               >
                 <MessageCircle className="w-8 h-8" />
                 <div className="text-left">
-                  <div className="font-bold text-lg">WhatsApp</div>
-                  <div className="text-white/80 text-sm">Respuesta inmediata</div>
+                  <div className="font-bold text-lg">Chateá con nosotros</div>
+                  <div className="text-white/80 text-sm">Respuesta inmediata 24/7</div>
                 </div>
               </a>
 
@@ -356,8 +356,8 @@ export default function HomePage() {
               >
                 <PlusCircle className="w-8 h-8" />
                 <div className="text-left">
-                  <div className="font-bold text-lg">Publicar Propiedad</div>
-                  <div className="text-white/80 text-sm">Únete a nuestra red</div>
+                  <div className="font-bold text-lg">Publicá tu propiedad</div>
+                  <div className="text-white/80 text-sm">Sumate a nuestra red</div>
                 </div>
               </a>
             </div>
@@ -422,16 +422,6 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Floating WhatsApp Button */}
-      <a
-        href={whatsappLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 w-16 h-16 bg-[#25D366] hover:bg-[#20bd5a] rounded-full flex items-center justify-center shadow-2xl whatsapp-pulse z-50 transition-colors"
-        aria-label="Contactar por WhatsApp"
-      >
-        <MessageCircle className="w-8 h-8 text-white" />
-      </a>
     </main>
   )
 }
