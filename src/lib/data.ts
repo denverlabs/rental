@@ -178,7 +178,23 @@ export async function saveProperties(properties: Property[]): Promise<boolean> {
   return true
 }
 
+// PROPERTIES - Fetch single from API
 export async function getProperty(id: string): Promise<Property | undefined> {
+  try {
+    const response = await fetch(`${API_URL}/api/properties/${id}`, {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      const data = await response.json()
+      console.log('Loaded property from API:', id)
+      return data
+    }
+  } catch (error) {
+    console.error('Error fetching property from API:', id, error)
+  }
+
+  // Fallback to searching in all properties (useful if direct endpoint fails but list works)
+  console.log('Falling back to local search for property:', id)
   const properties = await getProperties()
   return properties.find(p => p.id === id)
 }
