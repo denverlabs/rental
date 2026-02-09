@@ -8,7 +8,9 @@ import defaultProperties from '@/data/properties.json'
 const SETTINGS_KEY = 'data/settings.json'
 const PROPERTIES_KEY = 'data/properties.json'
 
-// Check if Blob is available
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+
+// Check if Blob is available (keep for legacy or other uses if needed)
 function hasBlobToken(): boolean {
   return !!process.env.BLOB_READ_WRITE_TOKEN
 }
@@ -87,9 +89,22 @@ async function saveToBlob(key: string, data: unknown): Promise<boolean> {
   }
 }
 
-// SETTINGS - Always fetch fresh from Blob
+// SETTINGS - Fetch fresh from API
 export async function getSettings(): Promise<SiteSettings> {
-  // Try to get from blob
+  try {
+    const response = await fetch(`${API_URL}/api/settings`, {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      const data = await response.json()
+      console.log('Loaded settings from API')
+      return data
+    }
+  } catch (error) {
+    console.error('Error fetching settings from API:', error)
+  }
+
+  // Fallback to blob if configured
   if (hasBlobToken()) {
     const blob = await getBlobByPrefix(SETTINGS_KEY)
     if (blob) {
@@ -118,9 +133,22 @@ export async function saveSettings(settings: SiteSettings): Promise<boolean> {
   return true
 }
 
-// PROPERTIES - Always fetch fresh from Blob
+// PROPERTIES - Fetch fresh from API
 export async function getProperties(): Promise<Property[]> {
-  // Try to get from blob
+  try {
+    const response = await fetch(`${API_URL}/api/properties`, {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      const data = await response.json()
+      console.log('Loaded properties from API')
+      return data
+    }
+  } catch (error) {
+    console.error('Error fetching properties from API:', error)
+  }
+
+  // Fallback to blob if configured
   if (hasBlobToken()) {
     const blob = await getBlobByPrefix(PROPERTIES_KEY)
     if (blob) {
