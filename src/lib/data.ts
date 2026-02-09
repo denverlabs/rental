@@ -142,7 +142,8 @@ export async function getProperties(): Promise<Property[]> {
     if (response.ok) {
       const data = await response.json()
       console.log('Loaded properties from API')
-      return data
+      // Extract properties array if wrapped in an object (as returned by the backend)
+      return Array.isArray(data) ? data : (data?.properties || [])
     }
   } catch (error) {
     console.error('Error fetching properties from API:', error)
