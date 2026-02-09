@@ -8,7 +8,9 @@ import defaultProperties from '@/data/properties.json'
 const SETTINGS_KEY = 'data/settings.json'
 const PROPERTIES_KEY = 'data/properties.json'
 
-// Check if Blob is available
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+
+// Check if Blob is available (keep for legacy or other uses if needed)
 function hasBlobToken(): boolean {
   return !!process.env.BLOB_READ_WRITE_TOKEN
 }
@@ -87,9 +89,22 @@ async function saveToBlob(key: string, data: unknown): Promise<boolean> {
   }
 }
 
-// SETTINGS - Always fetch fresh from Blob
+// SETTINGS - Fetch fresh from API
 export async function getSettings(): Promise<SiteSettings> {
-  // Try to get from blob
+  try {
+    const response = await fetch(`${API_URL}/api/settings`, {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      const data = await response.json()
+      console.log('Loaded settings from API')
+      return data
+    }
+  } catch (error) {
+    console.error('Error fetching settings from API:', error)
+  }
+
+  // Fallback to blob if configured
   if (hasBlobToken()) {
     const blob = await getBlobByPrefix(SETTINGS_KEY)
     if (blob) {
@@ -107,20 +122,38 @@ export async function getSettings(): Promise<SiteSettings> {
 }
 
 export async function saveSettings(settings: SiteSettings): Promise<boolean> {
-  // Save to blob
-  const saved = await saveToBlob(SETTINGS_KEY, settings)
-
-  if (!saved) {
-    console.error('Failed to save settings to blob')
+  try {
+    const response = await fetch(`${API_URL}/api/settings`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(settings)
+    })
+    return response.ok
+  } catch (error) {
+    console.error('Error saving settings to API:', error)
     return false
   }
-
-  return true
 }
 
-// PROPERTIES - Always fetch fresh from Blob
+// PROPERTIES - Fetch fresh from API
 export async function getProperties(): Promise<Property[]> {
-  // Try to get from blob
+  try {
+    const response = await fetch(`${API_URL}/api/properties`, {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      const data = await response.json()
+      console.log('Loaded properties from API')
+      // Extract properties array if wrapped in an object (as returned by the backend)
+      return Array.isArray(data) ? data : (data?.properties || [])
+    }
+  } catch (error) {
+    console.error('Error fetching properties from API:', error)
+  }
+
+  // Fallback to blob if configured
   if (hasBlobToken()) {
     const blob = await getBlobByPrefix(PROPERTIES_KEY)
     if (blob) {
@@ -137,49 +170,94 @@ export async function getProperties(): Promise<Property[]> {
   return defaultProperties as Property[]
 }
 
+// Note: saveProperties is deprecated in favor of atomic updates via REST API
 export async function saveProperties(properties: Property[]): Promise<boolean> {
-  // Save to blob
-  const saved = await saveToBlob(PROPERTIES_KEY, properties)
-
-  if (!saved) {
-    console.error('Failed to save properties to blob')
-    return false
-  }
-
-  return true
+  console.warn('saveProperties is deprecated. Use updateProperty, createProperty, or deleteProperty.')
+  return false
 }
 
+// PROPERTIES - Fetch single from API
 export async function getProperty(id: string): Promise<Property | undefined> {
+  const url = `${API_URL}/api/properties/${id}`
+  console.log('[DEBUG] getProperty calling:', url)
+  try {
+    const response = await fetch(url, {
+      cache: 'no-store'
+    })
+    console.log('[DEBUG] getProperty response status:', response.status)
+    if (response.ok) {
+      const data = await response.json()
+      console.log('[DEBUG] getProperty loaded:', id)
+      return data
+    }
+  } catch (error) {
+    console.error('[DEBUG] getProperty fetch error:', id, error)
+  }
+
+  // Fallback to searching in all properties
+  console.log('[DEBUG] Falling back to local search for property:', id)
   const properties = await getProperties()
-  return properties.find(p => p.id === id)
+  const found = properties.find(p => p.id === id)
+  console.log('[DEBUG] Fallback found:', found ? 'yes' : 'no')
+  return found
 }
 
 export async function updateProperty(id: string, updates: Partial<Property>): Promise<Property | null> {
-  const properties = await getProperties()
-  const index = properties.findIndex(p => p.id === id)
-  if (index === -1) return null
+  const url = `${API_URL}/api/properties/${id}`
+  console.log('[DEBUG] updateProperty calling:', url)
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updates)
+    })
 
-  properties[index] = { ...properties[index], ...updates }
-  await saveProperties(properties)
-  return properties[index]
+    console.log('[DEBUG] updateProperty response status:', response.status)
+    if (response.ok) {
+      console.log('[DEBUG] Updated property in API:', id)
+      // Re-fetch to get full updated object
+      const result = await getProperty(id)
+      console.log('[DEBUG] Re-fetch after update result:', result ? 'success' : 'failed')
+      return result || null
+    }
+  } catch (error) {
+    console.error('[DEBUG] updateProperty API error:', id, error)
+  }
+  return null
 }
 
 export async function createProperty(property: Omit<Property, 'id'>): Promise<Property> {
-  const properties = await getProperties()
-  const newProperty: Property = {
-    ...property,
-    id: `prop-${Date.now()}`
+  try {
+    const response = await fetch(`${API_URL}/api/properties`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(property)
+    })
+
+    if (response.ok) {
+      const newProp = await response.json()
+      console.log('Created property in API:', newProp.id)
+      return newProp
+    }
+  } catch (error) {
+    console.error('Error creating property in API:', error)
   }
-  properties.push(newProperty)
-  await saveProperties(properties)
-  return newProperty
+  // Fallback to local-looking ID if API fails (though it will fail to save elsewhere)
+  return { ...property, id: `prop-${Date.now()}` } as Property
 }
 
 export async function deleteProperty(id: string): Promise<boolean> {
-  const properties = await getProperties()
-  const filtered = properties.filter(p => p.id !== id)
-  if (filtered.length === properties.length) return false
-
-  await saveProperties(filtered)
-  return true
+  try {
+    const response = await fetch(`${API_URL}/api/properties/${id}`, {
+      method: 'DELETE'
+    })
+    return response.ok
+  } catch (error) {
+    console.error('Error deleting property from API:', id, error)
+    return false
+  }
 }
