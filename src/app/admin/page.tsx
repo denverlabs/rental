@@ -289,11 +289,10 @@ export default function AdminPage() {
           <nav className="space-y-2 flex-1">
             <button
               onClick={() => setActiveTab('properties')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                activeTab === 'properties'
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'properties'
                   ? 'bg-primary-500 text-white'
                   : 'text-gray-300 hover:bg-gray-800'
-              }`}
+                }`}
             >
               <Image className="w-5 h-5" />
               {sidebarOpen && <span>Propiedades</span>}
@@ -301,11 +300,10 @@ export default function AdminPage() {
 
             <button
               onClick={() => setActiveTab('settings')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                activeTab === 'settings'
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'settings'
                   ? 'bg-primary-500 text-white'
                   : 'text-gray-300 hover:bg-gray-800'
-              }`}
+                }`}
             >
               <Settings className="w-5 h-5" />
               {sidebarOpen && <span>Configuración</span>}
@@ -364,9 +362,8 @@ export default function AdminPage() {
 
         {/* Toast Message */}
         {message.text && (
-          <div className={`fixed top-20 right-6 z-50 px-6 py-3 rounded-lg shadow-lg ${
-            message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-          } text-white font-medium animate-fade-in`}>
+          <div className={`fixed top-20 right-6 z-50 px-6 py-3 rounded-lg shadow-lg ${message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white font-medium animate-fade-in`}>
             {message.text}
           </div>
         )}
@@ -432,22 +429,20 @@ export default function AdminPage() {
                       </button>
                       <button
                         onClick={() => toggleActive(property)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          property.active
+                        className={`p-2 rounded-lg transition-colors ${property.active
                             ? 'bg-green-100 text-green-600 hover:bg-green-200'
                             : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                        }`}
+                          }`}
                         title={property.active ? 'Desactivar' : 'Activar'}
                       >
                         {property.active ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
                       </button>
                       <button
                         onClick={() => toggleFeatured(property)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          property.featured
+                        className={`p-2 rounded-lg transition-colors ${property.featured
                             ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
                             : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                        }`}
+                          }`}
                         title={property.featured ? 'Quitar destacado' : 'Destacar'}
                       >
                         {property.featured ? <Star className="w-5 h-5 fill-current" /> : <StarOff className="w-5 h-5" />}
@@ -513,7 +508,7 @@ export default function AdminPage() {
                         value={settings.whatsappNumber}
                         onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
                         className="admin-input"
-                        placeholder="5491126569371"
+                        placeholder="17372081313"
                       />
                     </div>
                     <div>
@@ -737,11 +732,10 @@ function PropertyModal({
             <button
               type="button"
               onClick={() => setForm({ ...form, active: !form.active })}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                form.active
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${form.active
                   ? 'bg-green-100 text-green-700'
                   : 'bg-gray-200 text-gray-600'
-              }`}
+                }`}
             >
               {form.active ? (
                 <>
