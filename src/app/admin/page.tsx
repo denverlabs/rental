@@ -70,7 +70,7 @@ export default function AdminPage() {
     document.cookie = 'admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/'
   }
 
-  // Check session on mount (use cookies for persistence)
+  // Check session on mount (use cookies for good persistence)
   useEffect(() => {
     // Check cookie for auth
     const cookies = document.cookie.split(';')
@@ -290,8 +290,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab('properties')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'properties'
-                  ? 'bg-primary-500 text-white'
-                  : 'text-gray-300 hover:bg-gray-800'
+                ? 'bg-primary-500 text-white'
+                : 'text-gray-300 hover:bg-gray-800'
                 }`}
             >
               <Image className="w-5 h-5" />
@@ -301,8 +301,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab('settings')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'settings'
-                  ? 'bg-primary-500 text-white'
-                  : 'text-gray-300 hover:bg-gray-800'
+                ? 'bg-primary-500 text-white'
+                : 'text-gray-300 hover:bg-gray-800'
                 }`}
             >
               <Settings className="w-5 h-5" />
@@ -430,8 +430,8 @@ export default function AdminPage() {
                       <button
                         onClick={() => toggleActive(property)}
                         className={`p-2 rounded-lg transition-colors ${property.active
-                            ? 'bg-green-100 text-green-600 hover:bg-green-200'
-                            : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                          ? 'bg-green-100 text-green-600 hover:bg-green-200'
+                          : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                           }`}
                         title={property.active ? 'Desactivar' : 'Activar'}
                       >
@@ -440,8 +440,8 @@ export default function AdminPage() {
                       <button
                         onClick={() => toggleFeatured(property)}
                         className={`p-2 rounded-lg transition-colors ${property.featured
-                            ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
-                            : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                          ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
+                          : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                           }`}
                         title={property.featured ? 'Quitar destacado' : 'Destacar'}
                       >
@@ -733,8 +733,8 @@ function PropertyModal({
               type="button"
               onClick={() => setForm({ ...form, active: !form.active })}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${form.active
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-200 text-gray-600'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-gray-200 text-gray-600'
                 }`}
             >
               {form.active ? (
