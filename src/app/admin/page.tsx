@@ -508,7 +508,7 @@ export default function AdminPage() {
                         value={settings.whatsappNumber}
                         onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
                         className="admin-input"
-                        placeholder="17372081313"
+                        placeholder="+17372081313"
                       />
                     </div>
                     <div>
