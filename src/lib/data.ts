@@ -1,6 +1,6 @@
 import type { Property, SiteSettings } from '@/types'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://rond-point-rentals-ai-549090464338.us-central1.run.app'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://rond-point-rentals-ai-kx5aus62lq-uc.a.run.app'
 
 // Helper to fetch from API
 async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
