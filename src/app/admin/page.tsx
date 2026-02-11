@@ -731,6 +731,16 @@ function PropertyModal({
     }
   }
 
+  const extractAirbnbId = (url: string) => {
+    const match = url.match(/\/rooms\/(\d+)/)
+    return match ? match[1] : ''
+  }
+
+  const handleUrlChange = (url: string) => {
+    const id = extractAirbnbId(url)
+    setForm({ ...form, airbnbUrl: url, airbnbId: id || form.airbnbId })
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSave(form)
@@ -801,20 +811,20 @@ function PropertyModal({
                 <input
                   type="url"
                   value={form.airbnbUrl}
-                  onChange={(e) => setForm({ ...form, airbnbUrl: e.target.value })}
+                  onChange={(e) => handleUrlChange(e.target.value)}
                   className="admin-input border-red-100 focus:ring-red-500"
                   placeholder="https://www.airbnb.com/rooms/..."
                   required
                 />
               </div>
               <div>
-                <label className="admin-label">ID de Airbnb</label>
+                <label className="admin-label">ID de Airbnb (Automático)</label>
                 <input
                   type="text"
                   value={form.airbnbId || ''}
-                  onChange={(e) => setForm({ ...form, airbnbId: e.target.value })}
-                  className="admin-input border-red-100 focus:ring-red-500"
-                  placeholder="Ej: 12345678"
+                  readOnly
+                  className="admin-input border-red-100 bg-red-50/50 text-red-800 cursor-not-allowed"
+                  placeholder="Se extraerá de la URL..."
                 />
               </div>
             </div>
