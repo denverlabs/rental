@@ -19,7 +19,8 @@ import {
   Menu,
   ChevronLeft,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  Hash
 } from 'lucide-react'
 import type { Property, SiteSettings } from '@/types'
 
@@ -886,20 +887,36 @@ function PropertyModal({
             </div>
           </div>
 
-          {/* Airbnb URL */}
-          <div>
-            <label className="admin-label flex items-center gap-2">
-              <ExternalLink className="w-4 h-4" />
-              URL de Airbnb
-            </label>
-            <input
-              type="url"
-              value={form.airbnbUrl}
-              onChange={(e) => setForm({ ...form, airbnbUrl: e.target.value })}
-              className="admin-input"
-              placeholder="https://www.airbnb.com/rooms/..."
-              required
-            />
+          {/* Airbnb Info */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="admin-label flex items-center gap-2">
+                <ExternalLink className="w-4 h-4" />
+                URL de Airbnb
+              </label>
+              <input
+                type="url"
+                value={form.airbnbUrl}
+                onChange={(e) => setForm({ ...form, airbnbUrl: e.target.value })}
+                className="admin-input"
+                placeholder="https://www.airbnb.com/rooms/..."
+                required
+              />
+            </div>
+            <div>
+              <label className="admin-label flex items-center gap-2">
+                <Hash className="w-4 h-4" />
+                ID de Airbnb
+              </label>
+              <input
+                type="text"
+                value={form.airbnbId || ''}
+                onChange={(e) => setForm({ ...form, airbnbId: e.target.value })}
+                className="admin-input"
+                placeholder="Ej: 12345678"
+              />
+              <p className="text-xs text-gray-500 mt-1">ID numérico específico de Airbnb</p>
+            </div>
           </div>
 
           {/* Amenities */}
