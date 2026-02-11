@@ -111,6 +111,20 @@ export async function deleteProperty(id: string): Promise<boolean> {
   return !!response?.success
 }
 
+// AIRBNB IMPORT
+export async function importAirbnb(url: string): Promise<Partial<Property> | null> {
+  const data = await apiFetch<Partial<Property>>('properties/import-airbnb', {
+    method: 'POST',
+    body: JSON.stringify({ url: url.trim() }),
+  })
+
+  if (data && !('error' in data)) {
+    return data
+  }
+
+  return null
+}
+
 // Helper to save entire properties list (kept for compatibility, though API handles individual)
 export async function saveProperties(properties: Property[]): Promise<boolean> {
   console.warn('saveProperties is deprecated - use create/update/delete instead')

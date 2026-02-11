@@ -408,8 +408,13 @@ export default function AdminPage() {
                     <div className="flex items-start justify-between mb-1">
                       <h3 className="font-bold text-gray-900">{property.title || 'Sin título'}</h3>
                       {property.referenceCode && (
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-mono">
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-mono" title="Ficha">
                           {property.referenceCode}
+                        </span>
+                      )}
+                      {property.airbnbId && (
+                        <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded font-mono border border-red-100" title="Airbnb ID">
+                          {property.airbnbId}
                         </span>
                       )}
                     </div>
@@ -685,6 +690,48 @@ function PropertyModal({
     active: property.active !== false
   })
   const [amenityInput, setAmenityInput] = useState('')
+  const [importing, setImporting] = useState(false)
+  const [importUrl, setImportUrl] = useState('')
+  const [importError, setImportError] = useState('')
+
+  const handleImport = async () => {
+    if (!importUrl) return
+    setImporting(true)
+    setImportError('')
+    try {
+      const res = await fetch('/api/properties/import-airbnb', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: importUrl.trim() })
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setForm({
+          ...form,
+          title: data.title || form.title,
+          description: data.description || form.description,
+          location: data.location || form.location,
+          price: data.price || form.price,
+          guests: data.guests || form.guests,
+          bedrooms: data.bedrooms || form.bedrooms,
+          bathrooms: data.bathrooms || form.bathrooms,
+          amenities: data.amenities && data.amenities.length > 0 ? data.amenities : form.amenities,
+          images: data.images && data.images.length > 0
+            ? (data.images.length >= 3 ? data.images.slice(0, 3) : [...data.images, ...Array(3 - data.images.length).fill('')])
+            : form.images,
+          airbnbUrl: data.airbnbUrl || form.airbnbUrl
+        })
+        setImportUrl('')
+      } else {
+        const errorData = await res.json()
+        setImportError(errorData.error || 'Error al importar')
+      }
+    } catch (error) {
+      setImportError('Error de conexión')
+    } finally {
+      setImporting(false)
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -724,6 +771,42 @@ function PropertyModal({
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Airbnb Import (only for new properties) */}
+          {property.id.startsWith('new-') && (
+            <div className="p-4 bg-red-50 border border-red-100 rounded-lg space-y-3">
+              <div className="flex items-center gap-2 text-red-700 font-semibold mb-1">
+                <ExternalLink className="w-4 h-4" />
+                Importar desde Airbnb
+              </div>
+              <p className="text-sm text-red-600">
+                Pega el enlace de Airbnb para autocompletar la ficha técnica.
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={importUrl}
+                  onChange={(e) => setImportUrl(e.target.value)}
+                  className="admin-input flex-1 border-red-200 focus:ring-red-500"
+                  placeholder="https://www.airbnb.com/rooms/..."
+                />
+                <button
+                  type="button"
+                  onClick={handleImport}
+                  disabled={importing || !importUrl}
+                  className="bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shrink-0"
+                >
+                  {importing ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    'Importar'
+                  )}
+                </button>
+              </div>
+              {importError && (
+                <p className="text-xs text-red-500">{importError}</p>
+              )}
+            </div>
+          )}
           {/* Active Toggle */}
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
