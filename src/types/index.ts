@@ -1,6 +1,7 @@
 export interface Property {
   id: string;
   referenceCode?: string; // Número de ficha manual (ej: "PDE-001")
+  airbnbId?: string; // ID específico de Airbnb
   title: string;
   description: string;
   location: string;

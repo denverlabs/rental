@@ -19,7 +19,8 @@ import {
   Menu,
   ChevronLeft,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  Hash
 } from 'lucide-react'
 import type { Property, SiteSettings } from '@/types'
 
@@ -70,7 +71,7 @@ export default function AdminPage() {
     document.cookie = 'admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/'
   }
 
-  // Check session on mount (use cookies for persistence)
+  // Check session on mount (use cookies for good persistence)
   useEffect(() => {
     // Check cookie for auth
     const cookies = document.cookie.split(';')
@@ -290,8 +291,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab('properties')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'properties'
-                  ? 'bg-primary-500 text-white'
-                  : 'text-gray-300 hover:bg-gray-800'
+                ? 'bg-primary-500 text-white'
+                : 'text-gray-300 hover:bg-gray-800'
                 }`}
             >
               <Image className="w-5 h-5" />
@@ -301,8 +302,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab('settings')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activeTab === 'settings'
-                  ? 'bg-primary-500 text-white'
-                  : 'text-gray-300 hover:bg-gray-800'
+                ? 'bg-primary-500 text-white'
+                : 'text-gray-300 hover:bg-gray-800'
                 }`}
             >
               <Settings className="w-5 h-5" />
@@ -407,8 +408,13 @@ export default function AdminPage() {
                     <div className="flex items-start justify-between mb-1">
                       <h3 className="font-bold text-gray-900">{property.title || 'Sin título'}</h3>
                       {property.referenceCode && (
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-mono">
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-mono" title="Ficha">
                           {property.referenceCode}
+                        </span>
+                      )}
+                      {property.airbnbId && (
+                        <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded font-mono border border-red-100" title="Airbnb ID">
+                          {property.airbnbId}
                         </span>
                       )}
                     </div>
@@ -430,8 +436,8 @@ export default function AdminPage() {
                       <button
                         onClick={() => toggleActive(property)}
                         className={`p-2 rounded-lg transition-colors ${property.active
-                            ? 'bg-green-100 text-green-600 hover:bg-green-200'
-                            : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                          ? 'bg-green-100 text-green-600 hover:bg-green-200'
+                          : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                           }`}
                         title={property.active ? 'Desactivar' : 'Activar'}
                       >
@@ -440,8 +446,8 @@ export default function AdminPage() {
                       <button
                         onClick={() => toggleFeatured(property)}
                         className={`p-2 rounded-lg transition-colors ${property.featured
-                            ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
-                            : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                          ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
+                          : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                           }`}
                         title={property.featured ? 'Quitar destacado' : 'Destacar'}
                       >
@@ -508,7 +514,7 @@ export default function AdminPage() {
                         value={settings.whatsappNumber}
                         onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
                         className="admin-input"
-                        placeholder="17372081313"
+                        placeholder="+17372081313"
                       />
                     </div>
                     <div>
@@ -684,6 +690,56 @@ function PropertyModal({
     active: property.active !== false
   })
   const [amenityInput, setAmenityInput] = useState('')
+  const [importing, setImporting] = useState(false)
+  const [importError, setImportError] = useState('')
+
+  const handleImport = async () => {
+    if (!form.airbnbUrl) return
+    setImporting(true)
+    setImportError('')
+    try {
+      const res = await fetch('/api/properties/import-airbnb', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: form.airbnbUrl.trim() })
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setForm({
+          ...form,
+          title: data.title || form.title,
+          description: data.description || form.description,
+          location: data.location || form.location,
+          price: data.price || form.price,
+          guests: data.guests || form.guests,
+          bedrooms: data.bedrooms || form.bedrooms,
+          bathrooms: data.bathrooms || form.bathrooms,
+          amenities: data.amenities && data.amenities.length > 0 ? data.amenities : form.amenities,
+          images: data.images && data.images.length > 0
+            ? (data.images.length >= 3 ? data.images.slice(0, 3) : [...data.images, ...Array(3 - data.images.length).fill('')])
+            : form.images,
+          airbnbUrl: data.airbnbUrl || form.airbnbUrl
+        })
+      } else {
+        const errorData = await res.json()
+        setImportError(errorData.error || 'Error al importar')
+      }
+    } catch (error) {
+      setImportError('Error de conexión')
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  const extractAirbnbId = (url: string) => {
+    const match = url.match(/\/rooms\/(\d+)/)
+    return match ? match[1] : ''
+  }
+
+  const handleUrlChange = (url: string) => {
+    const id = extractAirbnbId(url)
+    setForm({ ...form, airbnbUrl: url, airbnbId: id || form.airbnbId })
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -723,6 +779,66 @@ function PropertyModal({
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Airbnb Info & Import (Moved to Top) */}
+          <div className="p-4 bg-red-50 border border-red-100 rounded-lg space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-red-700 font-semibold">
+                <ExternalLink className="w-4 h-4" />
+                Vincular con Airbnb
+              </div>
+              {property.id.startsWith('new-') && (
+                <button
+                  type="button"
+                  onClick={handleImport}
+                  disabled={importing || !form.airbnbUrl}
+                  className="bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors flex items-center gap-2 shrink-0 shadow-sm"
+                >
+                  {importing ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" />
+                      Precargar datos
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="admin-label">URL de Airbnb</label>
+                <input
+                  type="url"
+                  value={form.airbnbUrl}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  className="admin-input border-red-100 focus:ring-red-500"
+                  placeholder="https://www.airbnb.com/rooms/..."
+                  required
+                />
+              </div>
+              <div>
+                <label className="admin-label">ID de Airbnb (Automático)</label>
+                <input
+                  type="text"
+                  value={form.airbnbId || ''}
+                  readOnly
+                  className="admin-input border-red-100 bg-red-50/50 text-red-800 cursor-not-allowed"
+                  placeholder="Se extraerá de la URL..."
+                />
+              </div>
+            </div>
+
+            {importError && (
+              <p className="text-xs text-red-600 font-medium">{importError}</p>
+            )}
+
+            {property.id.startsWith('new-') && !importError && !importing && (
+              <p className="text-xs text-red-500/70">
+                Pega la URL de Airbnb y haz clic en <strong>Precargar datos</strong> para autocompletar la ficha técnica.
+              </p>
+            )}
+          </div>
           {/* Active Toggle */}
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
@@ -733,8 +849,8 @@ function PropertyModal({
               type="button"
               onClick={() => setForm({ ...form, active: !form.active })}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${form.active
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-200 text-gray-600'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-gray-200 text-gray-600'
                 }`}
             >
               {form.active ? (
@@ -886,21 +1002,6 @@ function PropertyModal({
             </div>
           </div>
 
-          {/* Airbnb URL */}
-          <div>
-            <label className="admin-label flex items-center gap-2">
-              <ExternalLink className="w-4 h-4" />
-              URL de Airbnb
-            </label>
-            <input
-              type="url"
-              value={form.airbnbUrl}
-              onChange={(e) => setForm({ ...form, airbnbUrl: e.target.value })}
-              className="admin-input"
-              placeholder="https://www.airbnb.com/rooms/..."
-              required
-            />
-          </div>
 
           {/* Amenities */}
           <div>
